@@ -92,11 +92,11 @@ plt.plot(ts.thuktong)
 
 # ภาพแสดงน้ำหนักของเลข 0
 plt.figure()
-plt.imshow(ts.w[:-1,0].reshape(28,28),cmap='gray_r')
+plt.imshow(ts.w[1:,0].reshape(28,28),cmap='gray_r')
 
 # ภาพแสดงน้ำหนักของเลข 1~9
 plt.figure()
 for i in range(1,10):
     plt.subplot(330+i)
-    plt.imshow(ts.w[:-1,i].reshape(28,28),cmap='gray_r')
+    plt.imshow(ts.w[1:,i].reshape(28,28),cmap='gray_r')
 plt.show()
