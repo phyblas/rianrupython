@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
-'''https://phyblas.hinaboshi.com/20161205'''
+'''
+โค้ดจากบทความในบล็อก หน้า
+https://phyblas.hinaboshi.com/20161205
+'''
 
 import numpy as np
 import matplotlib.pyplot as plt
