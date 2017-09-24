@@ -12,10 +12,10 @@ class ThotthoiSoftmax:
     def __init__(self,eta):
         self.eta = eta
 
-    def rianru(self,X,z,n_thamsam,n_batch=0,X_thotsop=0,z_thotsop=0,romaiphoem=0):
+    def rianru(self,X,z,n_thamsam,n_batch=0,X_truat=0,z_truat=0,romaiphoem=0):
         n = len(z)
-        if(type(X_thotsop)!=np.ndarray):
-            X_thotsop,z_thotsop = X,z
+        if(type(X_truat)!=np.ndarray):
+            X_truat,z_truat = X,z
         if(n_batch==0 or n<n_batch):
             n_batch = n
         self.kiklum = int(z.max()+1)
@@ -23,7 +23,7 @@ class ThotthoiSoftmax:
         self.w = np.zeros([X.shape[1]+1,self.kiklum])
         self.entropy = []
         self.thuktong = []
-        self.thuktong_thotsop = []
+        self.thuktong_truat = []
         thukmaksut = 0 # ค่าจำนวนที่ถูกมากสุด
         thukmaiphoem = 0 # นับว่าจำนวนที่ถูกไม่เพิ่มมาแล้วกี่ครั้ง
         for j in range(n_thamsam):
@@ -38,21 +38,21 @@ class ThotthoiSoftmax:
             
             thukmai = self.thamnai(X)==z
             thukmak = thukmai.mean()*100
-            thukmai = self.thamnai(X_thotsop)==z_thotsop
-            thukmak_thotsop = thukmai.mean()*100
+            thukmai = self.thamnai(X_truat)==z_truat
+            thukmak_truat = thukmai.mean()*100
             
-            if(thukmak_thotsop > thukmaksut):
+            if(thukmak_truat > thukmaksut):
                 # ถ้าจำนวนที่ถูกมากขึ้นกว่าเดิมก็บันทึกค่าจำนวนนั้น และน้ำหนักในตอนนั้นไว้
-                thukmaksut = thukmak_thotsop
+                thukmaksut = thukmak_truat
                 thukmaiphoem = 0
                 w = self.w.copy()
             else:
                 thukmaiphoem += 1 # ถ้าไม่ถูกมากขึ้นก็นับไว้ว่าไม่เพิ่มไปอีกครั้งแล้ว
             
             self.thuktong += [thukmak]
-            self.thuktong_thotsop += [thukmak_thotsop]
+            self.thuktong_truat += [thukmak_truat]
             self.entropy += [self.ha_entropy(X,z_1h)]
-            print(u'ครั้งที่ %d ถูก %.3f%% สูงสุด %.3f%% ไม่เพิ่มมาแล้ว %d ครั้ง'%(j+1,self.thuktong_thotsop[-1],thukmaksut,thukmaiphoem))
+            print(u'ครั้งที่ %d ถูก %.3f%% สูงสุด %.3f%% ไม่เพิ่มมาแล้ว %d ครั้ง'%(j+1,self.thuktong_truat[-1],thukmaksut,thukmaiphoem))
             
             if(romaiphoem!=0 and thukmaiphoem>=romaiphoem):
                 break # ถ้าจำนวนที่ถูกไม่เพิ่มเลย 10 ครั้งก็เลิกทำ
@@ -73,7 +73,7 @@ mnist = datasets.fetch_mldata('MNIST original')
 X,z = mnist.data,mnist.target
 X = X/255.
 np.random.seed(0)
-X_fuek,X_thotsop,z_fuek,z_thotsop = train_test_split(X,z,test_size=0.2)
+X_fuek,X_truat,z_fuek,z_truat = train_test_split(X,z,test_size=0.2)
 
 # เริ่มการเรียนรู้
 eta = 0.24 # อัตราการเรียนรู้
@@ -81,15 +81,16 @@ n_thamsam = 1000 # จำนวนทำซ้ำสูงสุดถ้าไ�
 n_batch = 100 # จำนวนมินิแบตช์
 romaiphoem = 10 # จะให้หยุดเมื่อความแม่นยำไม่เพิ่มเกินกี่ครั้ง
 ts = ThotthoiSoftmax(eta)
-ts.rianru(X_fuek,z_fuek,n_thamsam,n_batch,X_thotsop,z_thotsop,romaiphoem)
+ts.rianru(X_fuek,z_fuek,n_thamsam,n_batch,X_truat,z_truat,romaiphoem)
 
 # กราฟแสดงความคืบหน้าในการเรียนรู้
 ax = plt.subplot(211)
 ax.set_title(u'เอนโทรปี',fontname='Tahoma')
-plt.plot(ts.entropy)
+plt.plot(ts.entropy,'#000077')
 plt.tick_params(labelbottom='off')
 ax = plt.subplot(212)
 ax.set_title(u'% ถูก',fontname='Tahoma')
-plt.plot(ts.thuktong)
-plt.plot(ts.thuktong_thotsop)
+plt.plot(ts.thuktong,'#dd0000')
+plt.plot(ts.thuktong_truat,'#00aa00')
+plt.legend([u'ฝึกฝน',u'ตรวจสอบ'],prop={'family':'Tahoma'})
 plt.show()
