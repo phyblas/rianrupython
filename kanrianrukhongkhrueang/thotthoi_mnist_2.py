@@ -14,7 +14,7 @@ class ThotthoiSoftmax:
 
     def rianru(self,X,z,n_thamsam,n_batch=0,X_truat=0,z_truat=0,romaiphoem=0):
         n = len(z)
-        if(type(X_truat)!=np.ndarray):
+        if(type(X_truat)!=np.ndarray): # ถ้าไม่ได้ป้อนข้อมูลตรวจสอบมาด้วย ก็ให้ใช้ข้อมูลฝึกฝนเป็นข้อมูลตรวจสอบ
             X_truat,z_truat = X,z
         if(n_batch==0 or n<n_batch):
             n_batch = n
