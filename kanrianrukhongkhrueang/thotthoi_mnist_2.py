@@ -14,7 +14,7 @@ class ThotthoiSoftmax:
 
     def rianru(self,X,z,n_thamsam,n_batch=0,X_truat=0,z_truat=0,romaiphoem=0):
         n = len(z)
-        if(type(X_truat)!=np.ndarray):
+        if(type(X_truat)!=np.ndarray): # ถ้าไม่ได้ป้อนข้อมูลตรวจสอบมาด้วย ก็ให้ใช้ข้อมูลฝึกฝนเป็นข้อมูลตรวจสอบ
             X_truat,z_truat = X,z
         if(n_batch==0 or n<n_batch):
             n_batch = n
@@ -84,14 +84,13 @@ ts = ThotthoiSoftmax(eta)
 ts.rianru(X_fuek,z_fuek,n_thamsam,n_batch,X_truat,z_truat,romaiphoem)
 
 # กราฟแสดงความคืบหน้าในการเรียนรู้
-plt.figure(figsize=[8,8])
 ax = plt.subplot(211)
+ax.set_title(u'เอนโทรปี',fontname='Tahoma')
 plt.plot(ts.entropy,'#000077')
-plt.legend([u'損失'],prop={'family':'AppleGothic','size':17})
 plt.tick_params(labelbottom='off')
 ax = plt.subplot(212)
-ax.set_ylabel(u'精度 (%)',fontname='AppleGothic',size=18)
+ax.set_title(u'% ถูก',fontname='Tahoma')
 plt.plot(ts.thuktong,'#dd0000')
 plt.plot(ts.thuktong_truat,'#00aa00')
-plt.legend([u'訓練',u'檢證'],prop={'family':'AppleGothic','size':17})
+plt.legend([u'ฝึกฝน',u'ตรวจสอบ'],prop={'family':'Tahoma'})
 plt.show()
