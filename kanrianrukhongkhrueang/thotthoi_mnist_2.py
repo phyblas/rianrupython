@@ -8,7 +8,7 @@ def softmax(x):
     exp_x = np.exp(x.T-x.max(1))
     return (exp_x/exp_x.sum(0)).T
 
-class ThotthoiSoftmax:
+class ThotthoiLogistic:
     def __init__(self,eta):
         self.eta = eta
 
@@ -80,17 +80,17 @@ eta = 0.24 # อัตราการเรียนรู้
 n_thamsam = 1000 # จำนวนทำซ้ำสูงสุดถ้าไม่มีการหยุดเสียก่อน
 n_batch = 100 # จำนวนมินิแบตช์
 romaiphoem = 10 # จะให้หยุดเมื่อความแม่นยำไม่เพิ่มเกินกี่ครั้ง
-ts = ThotthoiSoftmax(eta)
-ts.rianru(X_fuek,z_fuek,n_thamsam,n_batch,X_truat,z_truat,romaiphoem)
+tl = ThotthoiLogistic(eta)
+tl.rianru(X_fuek,z_fuek,n_thamsam,n_batch,X_truat,z_truat,romaiphoem)
 
 # กราฟแสดงความคืบหน้าในการเรียนรู้
 ax = plt.subplot(211)
 ax.set_title(u'เอนโทรปี',fontname='Tahoma')
-plt.plot(ts.entropy,'#000077')
+plt.plot(tl.entropy,'#000077')
 plt.tick_params(labelbottom='off')
 ax = plt.subplot(212)
 ax.set_title(u'% ถูก',fontname='Tahoma')
-plt.plot(ts.maen_fuek,'#dd0000')
-plt.plot(ts.maen_truat,'#00aa00')
+plt.plot(tl.maen_fuek,'#dd0000')
+plt.plot(tl.maen_truat,'#00aa00')
 plt.legend([u'ฝึกฝน',u'ตรวจสอบ'],prop={'family':'Tahoma'})
 plt.show()

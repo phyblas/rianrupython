@@ -12,7 +12,7 @@ def softmax(x):
     exp_x = np.exp(x.T-x.max(1))
     return (exp_x/exp_x.sum(0)).T
 
-class ThotthoiSoftmax:
+class ThotthoiLogistic:
     def __init__(self,eta):
         self.eta = eta
 
@@ -78,25 +78,25 @@ eta = 0.24
 n_thamsam = 1000
 n_batch = 100
 romaiphoem = 10
-ts = ThotthoiSoftmax(eta)
-ts.rianru(X,z,n_thamsam,n_batch,romaiphoem)
+tl = ThotthoiLogistic(eta)
+tl.rianru(X,z,n_thamsam,n_batch,romaiphoem)
 
 # กราฟแสดงความคืบหน้าในการเรียนรู้
 ax = plt.subplot(211)
 ax.set_title(u'เอนโทรปี',fontname='Tahoma')
-plt.plot(ts.entropy)
+plt.plot(tl.entropy)
 plt.tick_params(labelbottom='off')
 ax = plt.subplot(212)
 ax.set_title(u'% ถูก',fontname='Tahoma')
-plt.plot(ts.thuktong)
+plt.plot(tl.thuktong)
 
 # ภาพแสดงน้ำหนักของเลข 0
 plt.figure()
-plt.imshow(ts.w[1:,0].reshape(28,28),cmap='gray_r')
+plt.imshow(tl.w[1:,0].reshape(28,28),cmap='gray_r')
 
 # ภาพแสดงน้ำหนักของเลข 1~9
 plt.figure()
 for i in range(1,10):
     plt.subplot(330+i)
-    plt.imshow(ts.w[1:,i].reshape(28,28),cmap='gray_r')
+    plt.imshow(tl.w[1:,i].reshape(28,28),cmap='gray_r')
 plt.show()
