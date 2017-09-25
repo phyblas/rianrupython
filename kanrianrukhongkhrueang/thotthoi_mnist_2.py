@@ -22,10 +22,10 @@ class ThotthoiSoftmax:
         z_1h = z[:,None]==range(self.kiklum)
         self.w = np.zeros([X.shape[1]+1,self.kiklum])
         self.entropy = []
-        self.thuktong = []
-        self.thuktong_truat = []
-        thukmaksut = 0 # ค่าจำนวนที่ถูกมากสุด
-        thukmaiphoem = 0 # นับว่าจำนวนที่ถูกไม่เพิ่มมาแล้วกี่ครั้ง
+        self.maen_fuek = []
+        self.maen_truat = []
+        disut = 0 # ค่าจำนวนที่ถูกมากสุด
+        maiphoem = 0 # นับว่าจำนวนที่ถูกไม่เพิ่มมาแล้วกี่ครั้ง
         for j in range(n_thamsam):
             lueak = np.random.permutation(n)
             for i in range(0,n,n_batch):
@@ -37,25 +37,25 @@ class ThotthoiSoftmax:
                 self.w[0] += eee.sum(0)
             
             thukmai = self.thamnai(X)==z
-            thukmak = thukmai.mean()*100
+            maen_fuek = thukmai.mean()*100
             thukmai = self.thamnai(X_truat)==z_truat
-            thukmak_truat = thukmai.mean()*100
+            maen_truat = thukmai.mean()*100
             
-            if(thukmak_truat > thukmaksut):
+            if(maen_truat > disut):
                 # ถ้าจำนวนที่ถูกมากขึ้นกว่าเดิมก็บันทึกค่าจำนวนนั้น และน้ำหนักในตอนนั้นไว้
-                thukmaksut = thukmak_truat
-                thukmaiphoem = 0
+                disut = maen_truat
+                maiphoem = 0
                 w = self.w.copy()
             else:
-                thukmaiphoem += 1 # ถ้าไม่ถูกมากขึ้นก็นับไว้ว่าไม่เพิ่มไปอีกครั้งแล้ว
+                maiphoem += 1 # ถ้าไม่ถูกมากขึ้นก็นับไว้ว่าไม่เพิ่มไปอีกครั้งแล้ว
             
-            self.thuktong += [thukmak]
-            self.thuktong_truat += [thukmak_truat]
+            self.maen_fuek += [maen_fuek]
+            self.maen_truat += [maen_truat]
             self.entropy += [self.ha_entropy(X,z_1h)]
-            print(u'ครั้งที่ %d ถูก %.3f%% สูงสุด %.3f%% ไม่เพิ่มมาแล้ว %d ครั้ง'%(j+1,self.thuktong_truat[-1],thukmaksut,thukmaiphoem))
+            print(u'ครั้งที่ %d ถูก %.3f%% สูงสุด %.3f%% ไม่เพิ่มมาแล้ว %d ครั้ง'%(j+1,self.maen_truat[-1],disut,maiphoem))
             
-            if(romaiphoem!=0 and thukmaiphoem>=romaiphoem):
-                break # ถ้าจำนวนที่ถูกไม่เพิ่มเลย 10 ครั้งก็เลิกทำ
+            if(romaiphoem!=0 and maiphoem>=romaiphoem):
+                break # ถ้าจำนวนที่ถูกไม่เพิ่มเลยจนถึงจำนวนที่กำหนดก็เลิกทำ
                 
         self.w = w # ค่าน้ำหนักที่ได้ในท้ายสุด เอาตามค่าที่ทำให้ทายถูกมากที่สุด
 
@@ -90,7 +90,7 @@ plt.plot(ts.entropy,'#000077')
 plt.tick_params(labelbottom='off')
 ax = plt.subplot(212)
 ax.set_title(u'% ถูก',fontname='Tahoma')
-plt.plot(ts.thuktong,'#dd0000')
-plt.plot(ts.thuktong_truat,'#00aa00')
+plt.plot(ts.maen_fuek,'#dd0000')
+plt.plot(ts.maen_truat,'#00aa00')
 plt.legend([u'ฝึกฝน',u'ตรวจสอบ'],prop={'family':'Tahoma'})
 plt.show()
