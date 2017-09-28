@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+'''
+โค้ดจากบทความในบล็อก หน้า
+https://phyblas.hinaboshi.com/20170928
+'''
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
