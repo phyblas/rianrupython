@@ -15,9 +15,9 @@ def softmax(x):
 
 class ThotthoiLogistic:
     def __init__(self,eta,reg='l2',l=0):
-        self.eta = eta
-        self.reg = reg
-        self.l = l
+        self.eta = eta # อัตราการเรียนรู้
+        self.reg = reg # รูปแบบการเรกูลาไรซ์
+        self.l = l # ขนาดของเรกูลาไรซ์
 
     def rianru(self,X,z,n_thamsam,n_batch=0,X_truat=0,z_truat=0,romaiphoem=0):
         n = len(z)
@@ -31,10 +31,10 @@ class ThotthoiLogistic:
         self.dw = self.w.copy() # สร้างอาเรย์สำหรับพักค่าการเปลี่ยนแปลงน้ำหนักด้วย
         
         self.khasiahai = [] # ลิสต์บันทึกค่าเสียหาย (เอนโทรปี+เรกูลาไรซ์)
-        self.maen_fuek = [] # ลิสต์บันทึกค่าความแม่นในการทำนายข้อมุลฝึก
-        self.maen_truat = [] # ลิสต์บันทึกค่าความแม่นในการทำนายข้อมุลตรวจสอบ
-        disut = 0 # ค่าจำนวนที่ถูกมากสุด
-        maiphoem = 0 # นับว่าจำนวนที่ถูกไม่เพิ่มมาแล้วกี่ครั้ง
+        self.maen_fuek = [] # ลิสต์บันทึกค่าความแม่นยำในการทำนายข้อมุลฝึก
+        self.maen_truat = [] # ลิสต์บันทึกค่าความแม่นยำในการทำนายข้อมุลตรวจสอบ
+        disut = 0 # ค่าความแม่นยำดีสุดที่ได้
+        maiphoem = 0 # นับว่าความแม่นยำไม่เพิ่มมาแล้วกี่ครั้ง
         for j in range(n_thamsam):
             lueak = np.random.permutation(n)
             for i in range(0,n,n_batch):
@@ -44,7 +44,7 @@ class ThotthoiLogistic:
                 eee = (zn-phi)/len(zn)
                 self.dw[1:] = np.dot(eee.T,Xn).T
                 self.dw[0] = eee.sum(0)
-                # หาก l ไม่เป็น 0 ให้ปรับค่าน้ำหนักตามการเรกูลาไรซ์
+                # หาก l ไม่เป็น 0 ให้ปรับค่าน้ำหนักตามผลจากการเรกูลาไรซ์ด้วย
                 if(self.l>0):
                     if(self.reg=='l1'):
                         self.dw[1:] -= (self.w[1:]!=0)*np.where(self.w[1:]>0,1,-1)*self.l/n
@@ -56,13 +56,13 @@ class ThotthoiLogistic:
             maen_fuek = thukmai.mean()*100
             thukmai = self.thamnai(X_truat)==z_truat
             maen_truat = thukmai.mean()*100
-            khasiahai = self.ha_entropy(X,z_1h) # ค่าเสียหาย
-            # หาก l ไม่เป็น 0 ให้บวกเรกูลาไรซ์เข้าไปในค่าเสียหายด้วย
-            if(l!=0):
+            khasiahai = self.ha_entropy(X,z_1h) # ค่าเสียหายจากเอนโทรปี
+            # หาก l ไม่เป็น 0 ให้บวกเรกูลาไรซ์เพิ่มเข้าไปในค่าเสียหายด้วย
+            if(self.l>0):
                 if(reg=='l1'):
-                    khasiahai += l*np.abs(self.w[1:]).sum()
-                else:
-                    khasiahai += l*((self.w[1:])**2).sum()
+                    khasiahai += self.l*np.abs(self.w[1:]).sum()
+                else: # l2
+                    khasiahai += self.l*((self.w[1:])**2).sum()
             
             if(maen_truat > disut):
                 # ถ้าจำนวนที่ถูกมากขึ้นกว่าเดิมก็บันทึกค่าจำนวนนั้น และน้ำหนักในตอนนั้นไว้
@@ -90,6 +90,8 @@ class ThotthoiLogistic:
 
     def ha_entropy(self,X,z_1h):
         return -(z_1h*np.log(self.ha_softmax(X)+1e-7)).mean()
+
+
 
 # ดึงข้อมูล MNIST
 np.random.seed(0)
