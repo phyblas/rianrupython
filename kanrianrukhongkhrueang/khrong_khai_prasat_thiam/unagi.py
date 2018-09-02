@@ -1,3 +1,4 @@
+# coding: utf-8
 '''
 รวมคลาสและฟังก์ชันที่ใช้ในบทเรียนโครงข่ายประสาทเทียมเบื้องต้น
 https://phyblas.hinaboshi.com/saraban/khrong_khai_prasat_thiam
@@ -223,28 +224,28 @@ class Batchnorm(Chan):
         self.fuekyu = 1
     
     def pai(self,x):
-        self.n = len(x)
         if(self.fuekyu):
+            self.n = len(x)
             mu = x.mean(0)
             self.xc = x-mu
             var = (self.xc**2).mean(0)+1e-8
-            self.std = np.sqrt(var)
-            self.xn = self.xc/self.std
+            self.sigma = np.sqrt(var)
+            self.xn = xn = self.xc/self.sigma
             self.rmu = self.mmt*self.rmu + (1.-self.mmt)*mu
             self.rvar = self.mmt*self.rvar + (1.-self.mmt)*var
         else:
-            self.xc = x - self.rmu
-            self.xn = self.xc/np.sqrt(self.rvar)
+            xc = x - self.rmu
+            xn = xc/np.sqrt(self.rvar)
         
-        return self.param[0].kha*self.xn+self.param[1].kha
+        return self.param[0].kha*xn+self.param[1].kha
     
     def yon(self,g):
         self.param[0].g = (g*self.xn).sum(0)
         self.param[1].g = g.sum(0)
         gxn = self.param[0].kha*g
-        gstd = -np.sum((gxn*self.xc)/(self.std*self.std),0)
-        gvar = gstd/self.std/2
-        gxc = gxn/self.std + (2./self.n)*self.xc*gvar
+        gsigma = -((gxn*self.xc)/self.sigma**2).sum(0)
+        gvar = gsigma/self.sigma/2
+        gxc = gxn/self.sigma + (2./self.n)*self.xc*gvar
         gmu = gxc.sum(0)
         gx = gxc - gmu/self.n
         return gx
@@ -263,8 +264,8 @@ class Lrelu(Chan):
         return g*np.where(self.krong,1,self.a)
 
 class Prelu(Chan):
-    def __init__(self,a=0.25):
-        self.param = [Param(a)]
+    def __init__(self,m,a=0.25):
+        self.param = [Param(np.ones(m)*a)]
     
     def pai(self,x):
         self.krong = (x>0)
@@ -272,7 +273,7 @@ class Prelu(Chan):
         return x*np.where(self.krong,1,self.param[0].kha)
     
     def yon(self,g):
-        self.param[0].g += (self.x*(self.krong==0)).sum()
+        self.param[0].g += (self.x*(self.krong==0)).sum(0)
         return g*np.where(self.krong,1,self.param[0].kha)
 
 class Elu(Chan):
@@ -307,14 +308,6 @@ class Tanh(Chan):
     def yon(self,g):
         return g*(1-self.h**2)
 
-class Softplus(Chan):
-    def pai(self,x):
-        self.exp_x = np.exp(x)
-        return np.log(1+self.exp_x)
-    
-    def yon(self,g):
-        return g*self.exp_x/(1+self.exp_x)
-
 class Softsign(Chan):
     def pai(self,x):
         self.abs_x_1 = np.abs(x)+1
@@ -322,6 +315,14 @@ class Softsign(Chan):
     
     def yon(self,g):
         return g/self.abs_x_1**2
+
+class Softplus(Chan):
+    def pai(self,x):
+        self.exp_x = np.exp(x)
+        return np.log(1+self.exp_x)
+    
+    def yon(self,g):
+        return g*self.exp_x/(1+self.exp_x)
     
 
 
@@ -511,12 +512,12 @@ class Plianrup(Chan):
 
 def sigmoid(x): return Sigmoid()(x)
 def relu(x): return Relu()(x)
-def softmax_entropy(a,Z): return Softmax_entropy()(a,Z)
-def sigmoid_entropy(a,z): return Sigmoid_entropy()(a,z)
-def mse(h,z): return Mse()(h,z)
 def lrelu(x): return Lrelu()(x)
 def elu(x): return Elu()(x)
 def selu(x): return Selu()(x)
 def tanh(x): return Tanh()(x)
 def softplus(x): return Softplus()(x)
 def softsign(x): return Softsign()(x)
+def softmax_entropy(a,Z): return Softmax_entropy()(a,Z)
+def sigmoid_entropy(a,z): return Sigmoid_entropy()(a,z)
+def mse(h,z): return Mse()(h,z)
